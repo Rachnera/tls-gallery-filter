@@ -579,6 +579,18 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
   
   def play_event
+    if @select_window.is_separator?
+      #TODO: Would be even better if not selectable at all
+      return_scene
+      return
+    end
+
+    if @select_window.is_filter_button?
+      #TODO
+      return_scene
+      return
+    end
+
     $game_temp.reserve_common_event(@select_window.get_current_event_id)
     Window_Message.lw_set_opaque(true)
     return_scene
@@ -597,7 +609,10 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
   
   def get_data
-    result = []
+    result = [
+      ["Filter"],
+      ["-----"],
+    ]
     TLS_Scenes::Scene_data.each do |current|
       if(check_scene_visible(current) ) then
         result.push([current[0], get_event_id_for_name(current[0]), current[1], current[2]])
@@ -654,9 +669,22 @@ class TLS_Replay_Select_Window < Window_Selectable
   
   def update
     super
+
+    if is_filter_button? || is_separator?
+      @face_window.reset
+      return
+    end
+
     @face_window.set_faces(@data[index][2], @data[index][3]) if @data[index]
   end
+
+  def is_filter_button?
+    @data[index][0] == "Filter"
+  end
   
+  def is_separator?
+    @data[index][0] == "-----"
+  end
 end
 
 class TLS_Replay_Face_Window < Window_Base
@@ -670,8 +698,10 @@ class TLS_Replay_Face_Window < Window_Base
       draw_face(face_names[index], face_IDs[index], (index % 2) * 112, (index / 2) * 112)
     end
   end
-  
-  
+
+  def reset()
+    contents.clear
+  end
 end
 
 class Window_Message
