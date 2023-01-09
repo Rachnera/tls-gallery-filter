@@ -579,12 +579,6 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
   
   def play_event
-    if @select_window.is_separator?
-      #TODO: Would be even better if not selectable at all
-      return_scene
-      return
-    end
-
     if @select_window.is_filter_button?
       #TODO
       return_scene
@@ -684,6 +678,10 @@ class TLS_Replay_Select_Window < Window_Selectable
   
   def is_separator?
     @data[index][0] == "-----"
+  end
+
+  def current_item_enabled?
+    !is_separator?
   end
 end
 
