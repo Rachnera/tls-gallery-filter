@@ -581,8 +581,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
   
   def play_event
     if @select_window.is_filter_button?
-      @filter_window.show
-      @filter_window.select(0)
+      show_filter_window
       return
     end
 
@@ -593,16 +592,31 @@ class Scene_TLS_Replayer < Scene_MenuBase
   
   def create_filter_window
     @filter_window = TLS_Scene_Filter.new(Graphics.width*0.125, Graphics.height*0.125, Graphics.width*0.75, Graphics.height*0.75)
-    @filter_window.set_handler(:cancel, method(:hide_filter_window))
-    #TODO: ok handler
+    @filter_window.set_handler(:cancel, method(:reset_filter))
+    @filter_window.set_handler(:ok, method(:set_filter))
     @filter_window.hide
-    @filter_window.activate
   end
-  
+
+  def show_filter_window
+    @filter_window.show
+    @filter_window.activate
+    @filter_window.select(0)
+  end
+
   def hide_filter_window
     @filter_window.hide
-    # FIXME: Likely a better way to return to the main window
-    return_scene
+    @select_window.activate
+  end
+
+  def set_filter
+    filter = @filter_window.get_filter
+    @select_window.filter_data(filter)
+    hide_filter_window
+  end
+
+  def reset_filter
+    @select_window.reset_data
+    hide_filter_window
   end
 end
 
@@ -696,6 +710,21 @@ class TLS_Replay_Select_Window < Window_Selectable
   def current_item_enabled?
     !is_separator?
   end
+
+  def reset_data
+    @data = get_data
+    refresh
+  end
+
+  def filter_data(filter)
+    @data = get_data.select do |elt|
+      next true if elt[0] == "Filter" or elt[0] == "-----"
+      elt[2].any? do |sprite_name|
+        sprite_name.include?(filter)
+      end
+    end
+    refresh
+  end
 end
 
 class TLS_Replay_Face_Window < Window_Base
@@ -758,5 +787,9 @@ class TLS_Scene_Filter < Window_Selectable
     item = @data[index]
     rect = item_rect(index)
     draw_text(rect, item)
+  end
+
+  def get_filter
+    @data[index]
   end
 end
