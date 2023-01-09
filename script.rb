@@ -561,6 +561,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
     super
     create_select_window
     create_face_window
+    create_filter_window
   end
   
   
@@ -580,8 +581,8 @@ class Scene_TLS_Replayer < Scene_MenuBase
   
   def play_event
     if @select_window.is_filter_button?
-      #TODO
-      return_scene
+      @filter_window.show
+      @filter_window.select(0)
       return
     end
 
@@ -590,7 +591,19 @@ class Scene_TLS_Replayer < Scene_MenuBase
     return_scene
   end
   
+  def create_filter_window
+    @filter_window = TLS_Scene_Filter.new(Graphics.width*0.125, Graphics.height*0.125, Graphics.width*0.75, Graphics.height*0.75)
+    @filter_window.set_handler(:cancel, method(:hide_filter_window))
+    #TODO: ok handler
+    @filter_window.hide
+    @filter_window.activate
+  end
   
+  def hide_filter_window
+    @filter_window.hide
+    # FIXME: Likely a better way to return to the main window
+    return_scene
+  end
 end
 
 class TLS_Replay_Select_Window < Window_Selectable
@@ -721,5 +734,29 @@ class Window_Message
   def self.lw_set_opaque(flag)
     @@lw_opaque_flag = flag
     p(flag)
+  end
+end
+
+class TLS_Scene_Filter < Window_Selectable
+  def initialize(x, y, width, height)
+    super
+    # TODO: Actual list
+    @data = ["Aka", "Janine", "Yarra"]
+    self.z = 999 # Arbitrarily high number to force the window to appear above everything else on the screen
+    refresh
+  end
+
+  def col_max
+    5
+  end
+
+  def item_max
+    @data ? @data.size : 0
+  end
+
+  def draw_item(index)
+    item = @data[index]
+    rect = item_rect(index)
+    draw_text(rect, item)
   end
 end
