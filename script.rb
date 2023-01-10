@@ -636,14 +636,16 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
   
   def play_event
-    if @select_window.is_filter_button?
-      show_filter_window
-      return
-    end
+    if TLS_Scenes::EnableFiltering
+      if @select_window.is_filter_button?
+        show_filter_window
+        return
+      end
 
-    if @select_window.is_clear_button?
-      reset_filter
-      return
+      if @select_window.is_clear_button?
+        reset_filter
+        return
+      end
     end
 
     $game_temp.reserve_common_event(@select_window.get_current_event_id)
@@ -727,20 +729,23 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
     
   def draw_item(i)
-    if @data[i][0] == TLS_Scenes::FilterLabel
-      change_color(text_color(24))
-      text = @data[i][0] + (@filter.nil? ? "" : ": " + @filter)
-      draw_text(item_rect(i), text)
-      return
+    if TLS_Scenes::EnableFiltering
+      if @data[i][0] == TLS_Scenes::FilterLabel
+        change_color(text_color(24))
+        text = @data[i][0] + (@filter.nil? ? "" : ": " + @filter)
+        draw_text(item_rect(i), text)
+        return
+      end
+
+      if @data[i][0] == TLS_Scenes::ClearLabel
+        change_color(text_color(18))
+        draw_text(item_rect(i), @data[i][0])
+        return
+      end
+
+      change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
     end
 
-    if @data[i][0] == TLS_Scenes::ClearLabel
-      change_color(text_color(18))
-      draw_text(item_rect(i), @data[i][0])
-      return
-    end
-
-    change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
   end
@@ -757,7 +762,7 @@ class TLS_Replay_Select_Window < Window_Selectable
   def update
     super
 
-    if is_filter_button? || is_separator? || is_clear_button?
+    if TLS_Scenes::EnableFiltering && (is_filter_button? || is_separator? || is_clear_button?)
       @face_window.reset
       return
     end
