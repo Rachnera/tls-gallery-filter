@@ -555,6 +555,8 @@ module TLS_Scenes
 #~         "variable_at_least", 105, 50]
   ]
 
+  EnableFiltering = true
+
   Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum D'umpe", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
 
   # If a scene is given the exact same name as any of the two following words, weird issues will happen
@@ -614,7 +616,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
     super
     create_select_window
     create_face_window
-    create_filter_window
+    TLS_Scenes::EnableFiltering and create_filter_window
   end
   
   
@@ -683,10 +685,10 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
   
   def get_data
-    result = [
+    result = TLS_Scenes::EnableFiltering ? [
       [TLS_Scenes::FilterLabel],
       [TLS_Scenes::SeparatorLabel],
-    ]
+    ] : []
     TLS_Scenes::Scene_data.each do |current|
       if(TLS_Scenes::check_scene_visible(current) ) then
         result.push([current[0], get_event_id_for_name(current[0]), current[1], current[2]])
