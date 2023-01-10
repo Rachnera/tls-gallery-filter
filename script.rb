@@ -875,7 +875,7 @@ class TLS_Scene_Filter < Window_Selectable
   end
 
   def col_max
-    5
+    4
   end
 
   def item_max
