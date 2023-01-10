@@ -78,7 +78,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
   def create_filter_window
     @filter_window = TLS_Scene_Filter.new(Graphics.width*1/16, Graphics.height*1/16, Graphics.width*7/8, Graphics.height*7/8)
     @filter_window.remove_empty_categories(@select_window)
-    @filter_window.refresh #TODO: Check if actually needed
+    @filter_window.refresh
     @filter_window.set_handler(:cancel, method(:hide_filter_window))
     @filter_window.set_handler(:ok, method(:set_filter_from_ui))
     @filter_window.hide
