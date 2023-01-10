@@ -554,6 +554,24 @@ module TLS_Scenes
 #~         ["Aka emo"], [7],
 #~         "variable_at_least", 105, 50]
   ]
+
+  Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum D'umpe", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
+
+  # For non-NPC sprites that don't follow the convention "<character name> emo"
+  SpriteNameToCharacterName = {
+    "face002b" => "Simon",
+    "face002b dark" => "Simon",
+    "1 Simon dark" => "Simon",
+    "Wendis blond" => "Wendis",
+    "Wendis grey" => "Wendis",
+    "Monster1" => "Wendis",
+    "Z Orcent" => "Orcent",
+    "Dari1" => "Dari",
+    "Dari2" => "Dari",
+    "Robin blond" => "Robin",
+    "Robin grey" => "Robin",
+    "Sabitha H" => "Sabitha",
+  }
 end
 class Scene_TLS_Replayer < Scene_MenuBase
   
@@ -591,7 +609,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
   
   def create_filter_window
-    @filter_window = TLS_Scene_Filter.new(Graphics.width*0.125, Graphics.height*0.125, Graphics.width*0.75, Graphics.height*0.75)
+    @filter_window = TLS_Scene_Filter.new(Graphics.width*1/16, Graphics.height*1/16, Graphics.width*7/8, Graphics.height*7/8)
     @filter_window.set_handler(:cancel, method(:reset_filter))
     @filter_window.set_handler(:ok, method(:set_filter))
     @filter_window.hide
@@ -719,11 +737,24 @@ class TLS_Replay_Select_Window < Window_Selectable
   def filter_data(filter)
     @data = get_data.select do |elt|
       next true if elt[0] == "Filter" or elt[0] == "-----"
-      elt[2].any? do |sprite_name|
-        sprite_name.include?(filter)
-      end
+      sprites_to_categories(elt[2]).include?(filter)
     end
     refresh
+  end
+
+  # Dark magic to deduce a scene categories from its sprites
+  def sprites_to_categories(sprites)
+    sprites.map do |sprite_name|
+      category = sprite_name.gsub(/\s+emo.*/, '')
+      if TLS_Scenes::SpriteNameToCharacterName.has_key?(category)
+        category = TLS_Scenes::SpriteNameToCharacterName[category]
+      end
+      # Group all minor characters within the NPC category
+      unless TLS_Scenes::Categories.include?(category)
+        category = "NPC"
+      end
+      category
+    end.uniq
   end
 end
 
@@ -769,8 +800,7 @@ end
 class TLS_Scene_Filter < Window_Selectable
   def initialize(x, y, width, height)
     super
-    # TODO: Actual list
-    @data = ["Aka", "Janine", "Yarra"]
+    @data = TLS_Scenes::Categories
     self.z = 999 # Arbitrarily high number to force the window to appear above everything else on the screen
     refresh
   end
