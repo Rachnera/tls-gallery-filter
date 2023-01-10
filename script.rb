@@ -1,4 +1,6 @@
-# TODO
+# Rachnera Gallery Filter
+# Partial patch of LoneWolf Scene Replay to add a minimalist search feature to it
+# https://github.com/Rachnera/tls-gallery-filter for last version
 
 module TLS_Scenes
   Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum D'umpe", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
