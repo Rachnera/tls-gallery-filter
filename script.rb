@@ -612,19 +612,27 @@ module TLS_Scenes
 end
 
 class Scene_TLS_Replayer < Scene_MenuBase
-  
+  # Sorcery to remember the current setting after a scene is run
+  @@cursor_position = 0
+  @@filter = nil
+
   def start
     super
     create_select_window
     create_face_window
     TLS_Scenes::EnableFiltering and create_filter_window
+
+    if @@filter
+      set_filter(@@filter)
+    end
+    @select_window.select(@@cursor_position)
   end
   
   
   def create_select_window
     @select_window = TLS_Replay_Select_Window.new(0, 0, Graphics.width / 2, Graphics.height)
     @select_window.viewport = @viewport
-    @select_window.set_handler(:cancel, method(:return_scene))
+    @select_window.set_handler(:cancel, method(:cleanup))
     @select_window.set_handler(:ok, method(:play_event))
     @select_window.activate
     @select_window.refresh
@@ -648,6 +656,8 @@ class Scene_TLS_Replayer < Scene_MenuBase
       end
     end
 
+    @@cursor_position = @select_window.index
+    @@filter = @select_window.filter
     $game_temp.reserve_common_event(@select_window.get_current_event_id)
     Window_Message.lw_set_opaque(true)
     return_scene
@@ -656,7 +666,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
   def create_filter_window
     @filter_window = TLS_Scene_Filter.new(Graphics.width*1/16, Graphics.height*1/16, Graphics.width*7/8, Graphics.height*7/8)
     @filter_window.set_handler(:cancel, method(:hide_filter_window))
-    @filter_window.set_handler(:ok, method(:set_filter))
+    @filter_window.set_handler(:ok, method(:set_filter_from_ui))
     @filter_window.hide
   end
 
@@ -671,8 +681,12 @@ class Scene_TLS_Replayer < Scene_MenuBase
     @select_window.activate
   end
 
-  def set_filter
+  def set_filter_from_ui
     filter = @filter_window.get_filter
+    set_filter(filter)
+  end
+
+  def set_filter(filter)
     @select_window.filter_data(filter)
     @select_window.select(3)
     hide_filter_window
@@ -682,16 +696,21 @@ class Scene_TLS_Replayer < Scene_MenuBase
     @select_window.reset_data
     hide_filter_window
   end
+
+  def cleanup
+    @@cursor_position = 0
+    @@filter = nil
+    return_scene
+  end
 end
 
 class TLS_Replay_Select_Window < Window_Selectable
-  
+  attr_reader :filter
+
   def initialize(x, y, width, height)
     super(x, y, width, height)
     @data = get_extended_data
     @filter = nil
-    select(0)
-    
   end
 
   def get_extended_data
