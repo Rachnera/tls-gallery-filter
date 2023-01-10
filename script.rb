@@ -559,9 +559,10 @@ module TLS_Scenes
 
   Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum D'umpe", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
 
-  # If a scene is given the exact same name as any of the two following words, weird issues will happen
+  # If a scene is given the exact same name as any of the following words, weird issues will happen
   FilterLabel = "Filter"
   SeparatorLabel = "-----"
+  ClearLabel = "Clear filter"
 
   # For non-NPC sprites that don't follow the convention "<character name> emo"
   SpriteNameToCharacterName = {
@@ -640,6 +641,11 @@ class Scene_TLS_Replayer < Scene_MenuBase
       return
     end
 
+    if @select_window.is_clear_button?
+      reset_filter
+      return
+    end
+
     $game_temp.reserve_common_event(@select_window.get_current_event_id)
     Window_Message.lw_set_opaque(true)
     return_scene
@@ -647,7 +653,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
   
   def create_filter_window
     @filter_window = TLS_Scene_Filter.new(Graphics.width*1/16, Graphics.height*1/16, Graphics.width*7/8, Graphics.height*7/8)
-    @filter_window.set_handler(:cancel, method(:reset_filter))
+    @filter_window.set_handler(:cancel, method(:hide_filter_window))
     @filter_window.set_handler(:ok, method(:set_filter))
     @filter_window.hide
   end
@@ -679,17 +685,22 @@ class TLS_Replay_Select_Window < Window_Selectable
   
   def initialize(x, y, width, height)
     super(x, y, width, height)
-    @data = get_data
+    @data = get_extended_data
     @filter = nil
     select(0)
     
   end
-  
+
+  def get_extended_data
+    if TLS_Scenes::EnableFiltering
+      return [[TLS_Scenes::FilterLabel], [TLS_Scenes::SeparatorLabel]].concat(get_data)
+    end
+
+    get_data
+  end
+
   def get_data
-    result = TLS_Scenes::EnableFiltering ? [
-      [TLS_Scenes::FilterLabel],
-      [TLS_Scenes::SeparatorLabel],
-    ] : []
+    result = []
     TLS_Scenes::Scene_data.each do |current|
       if(TLS_Scenes::check_scene_visible(current) ) then
         result.push([current[0], get_event_id_for_name(current[0]), current[1], current[2]])
@@ -723,6 +734,12 @@ class TLS_Replay_Select_Window < Window_Selectable
       return
     end
 
+    if @data[i][0] == TLS_Scenes::ClearLabel
+      change_color(text_color(18))
+      draw_text(item_rect(i), @data[i][0])
+      return
+    end
+
     change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
@@ -740,7 +757,7 @@ class TLS_Replay_Select_Window < Window_Selectable
   def update
     super
 
-    if is_filter_button? || is_separator?
+    if is_filter_button? || is_separator? || is_clear_button?
       @face_window.reset
       return
     end
@@ -756,22 +773,26 @@ class TLS_Replay_Select_Window < Window_Selectable
     @data[index][0] == TLS_Scenes::SeparatorLabel
   end
 
+  def is_clear_button?
+    @data[index][0] == TLS_Scenes::ClearLabel
+  end
+
   def current_item_enabled?
     !is_separator?
   end
 
   def reset_data
     @filter = nil
-    @data = get_data
+    @data = get_extended_data
     refresh
   end
 
   def filter_data(filter)
     @filter = filter
-    @data = get_data.select do |elt|
-      next true if elt[0] == TLS_Scenes::FilterLabel or elt[0] == TLS_Scenes::SeparatorLabel
+    data = get_data.select do |elt|
       TLS_Scenes::sprites_to_categories(elt[2]).include?(filter)
     end
+    @data = [[TLS_Scenes::FilterLabel], [TLS_Scenes::ClearLabel], [TLS_Scenes::SeparatorLabel]].concat(data)
     refresh
   end
 end
