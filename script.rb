@@ -557,6 +557,10 @@ module TLS_Scenes
 
   Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum D'umpe", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
 
+  # If a scene is given the exact same name as any of the two following words, weird issues will happen
+  FilterLabel = "Filter"
+  SeparatorLabel = "-----"
+
   # For non-NPC sprites that don't follow the convention "<character name> emo"
   SpriteNameToCharacterName = {
     "face002b" => "Simon",
@@ -680,8 +684,8 @@ class TLS_Replay_Select_Window < Window_Selectable
   
   def get_data
     result = [
-      ["Filter"],
-      ["-----"],
+      [TLS_Scenes::FilterLabel],
+      [TLS_Scenes::SeparatorLabel],
     ]
     TLS_Scenes::Scene_data.each do |current|
       if(TLS_Scenes::check_scene_visible(current) ) then
@@ -734,11 +738,11 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
 
   def is_filter_button?
-    @data[index][0] == "Filter"
+    @data[index][0] == TLS_Scenes::FilterLabel
   end
   
   def is_separator?
-    @data[index][0] == "-----"
+    @data[index][0] == TLS_Scenes::SeparatorLabel
   end
 
   def current_item_enabled?
@@ -752,7 +756,7 @@ class TLS_Replay_Select_Window < Window_Selectable
 
   def filter_data(filter)
     @data = get_data.select do |elt|
-      next true if elt[0] == "Filter" or elt[0] == "-----"
+      next true if elt[0] == TLS_Scenes::FilterLabel or elt[0] == TLS_Scenes::SeparatorLabel
       TLS_Scenes::sprites_to_categories(elt[2]).include?(filter)
     end
     refresh
