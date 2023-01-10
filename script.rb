@@ -572,7 +572,38 @@ module TLS_Scenes
     "Robin grey" => "Robin",
     "Sabitha H" => "Sabitha",
   }
+
+  def self.check_scene_visible(scene_array)
+    case scene_array[3]
+    when "always"
+      true
+    when "switch_on"
+      $game_switches[scene_array[4]]
+    when "variable_at_least"
+      $game_variables[scene_array[4]] >= scene_array[5]
+    when "self_switch_on"
+      $game_self_switches[ [scene_array[4], scene_array[5], scene_array[6]] ]
+    else
+      false
+    end
+  end
+
+  # Dark magic to deduce a scene categories from its sprites
+  def self.sprites_to_categories(sprites)
+    sprites.map do |sprite_name|
+      category = sprite_name.gsub(/\s+emo.*/, '')
+      if TLS_Scenes::SpriteNameToCharacterName.has_key?(category)
+        category = TLS_Scenes::SpriteNameToCharacterName[category]
+      end
+      # Group all minor characters within the NPC category
+      unless TLS_Scenes::Categories.include?(category)
+        category = "NPC"
+      end
+      category
+    end.uniq
+  end
 end
+
 class Scene_TLS_Replayer < Scene_MenuBase
   
   def start
@@ -653,29 +684,14 @@ class TLS_Replay_Select_Window < Window_Selectable
       ["-----"],
     ]
     TLS_Scenes::Scene_data.each do |current|
-      if(check_scene_visible(current) ) then
+      if(TLS_Scenes::check_scene_visible(current) ) then
         result.push([current[0], get_event_id_for_name(current[0]), current[1], current[2]])
       end
     end
     p(result)
     return result
   end
-  
-  def check_scene_visible(scene_array)
-    case scene_array[3]
-    when "always"
-      true
-    when "switch_on"
-      $game_switches[scene_array[4]]
-    when "variable_at_least"
-      $game_variables[scene_array[4]] >= scene_array[5]
-    when "self_switch_on"
-      $game_self_switches[ [scene_array[4], scene_array[5], scene_array[6]] ]
-    else
-      false
-    end
-  end
-  
+
   def face_window= (window)
     @face_window = window
   end
@@ -737,24 +753,9 @@ class TLS_Replay_Select_Window < Window_Selectable
   def filter_data(filter)
     @data = get_data.select do |elt|
       next true if elt[0] == "Filter" or elt[0] == "-----"
-      sprites_to_categories(elt[2]).include?(filter)
+      TLS_Scenes::sprites_to_categories(elt[2]).include?(filter)
     end
     refresh
-  end
-
-  # Dark magic to deduce a scene categories from its sprites
-  def sprites_to_categories(sprites)
-    sprites.map do |sprite_name|
-      category = sprite_name.gsub(/\s+emo.*/, '')
-      if TLS_Scenes::SpriteNameToCharacterName.has_key?(category)
-        category = TLS_Scenes::SpriteNameToCharacterName[category]
-      end
-      # Group all minor characters within the NPC category
-      unless TLS_Scenes::Categories.include?(category)
-        category = "NPC"
-      end
-      category
-    end.uniq
   end
 end
 
@@ -800,7 +801,12 @@ end
 class TLS_Scene_Filter < Window_Selectable
   def initialize(x, y, width, height)
     super
-    @data = TLS_Scenes::Categories
+    # FIXME: Work as is, but does far more loops than it would with a different algorithm
+    @data = TLS_Scenes::Categories.select do |category|
+      TLS_Scenes::Scene_data.any? do |scene|
+        TLS_Scenes::check_scene_visible(scene) and TLS_Scenes::sprites_to_categories(scene[1]).include?(category)
+      end
+    end
     self.z = 999 # Arbitrarily high number to force the window to appear above everything else on the screen
     refresh
   end
