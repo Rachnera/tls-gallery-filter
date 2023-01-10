@@ -618,7 +618,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
 
   def start
     super
-    create_select_window
+    create_select_window_2
     create_face_window
     TLS_Scenes::EnableFiltering and create_filter_window
 
@@ -628,11 +628,12 @@ class Scene_TLS_Replayer < Scene_MenuBase
     @select_window.select(@@cursor_position)
   end
   
-  
-  def create_select_window
+  # Override the override from Decanter: Return to Replay Menu
+  # FIXME: Remove that weirdness when making it into a proper patch itself
+  def create_select_window_2
     @select_window = TLS_Replay_Select_Window.new(0, 0, Graphics.width / 2, Graphics.height)
     @select_window.viewport = @viewport
-    @select_window.set_handler(:cancel, method(:cleanup))
+    @select_window.set_handler(:cancel, method(:cancel_replay_menu_2))
     @select_window.set_handler(:ok, method(:play_event))
     @select_window.activate
     @select_window.refresh
@@ -697,7 +698,8 @@ class Scene_TLS_Replayer < Scene_MenuBase
     hide_filter_window
   end
 
-  def cleanup
+  def cancel_replay_menu_2
+    $game_switches[7] = false # must match condition for common event 4
     @@cursor_position = 0
     @@filter = nil
     return_scene
