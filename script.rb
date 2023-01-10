@@ -728,7 +728,6 @@ class TLS_Replay_Select_Window < Window_Selectable
         result.push([current[0], get_event_id_for_name(current[0]), current[1], current[2]])
       end
     end
-    p(result)
     return result
   end
 
@@ -857,7 +856,6 @@ class Window_Message
   
   def self.lw_set_opaque(flag)
     @@lw_opaque_flag = flag
-    p(flag)
   end
 end
 
