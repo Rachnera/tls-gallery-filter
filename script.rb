@@ -674,6 +674,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
   def set_filter
     filter = @filter_window.get_filter
     @select_window.filter_data(filter)
+    @select_window.select(3)
     hide_filter_window
   end
 
