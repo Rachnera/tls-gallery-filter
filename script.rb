@@ -680,6 +680,7 @@ class TLS_Replay_Select_Window < Window_Selectable
   def initialize(x, y, width, height)
     super(x, y, width, height)
     @data = get_data
+    @filter = nil
     select(0)
     
   end
@@ -715,6 +716,12 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
     
   def draw_item(i)
+    if @data[i][0] == TLS_Scenes::FilterLabel and not @filter.nil?
+      change_color(power_up_color)
+      draw_text(item_rect(i), @data[i][0] + ": " + @filter)
+      return
+    end
+
     change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
@@ -753,11 +760,13 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
 
   def reset_data
+    @filter = nil
     @data = get_data
     refresh
   end
 
   def filter_data(filter)
+    @filter = filter
     @data = get_data.select do |elt|
       next true if elt[0] == TLS_Scenes::FilterLabel or elt[0] == TLS_Scenes::SeparatorLabel
       TLS_Scenes::sprites_to_categories(elt[2]).include?(filter)
