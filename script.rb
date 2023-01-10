@@ -716,9 +716,10 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
     
   def draw_item(i)
-    if @data[i][0] == TLS_Scenes::FilterLabel and not @filter.nil?
-      change_color(power_up_color)
-      draw_text(item_rect(i), @data[i][0] + ": " + @filter)
+    if @data[i][0] == TLS_Scenes::FilterLabel
+      change_color(text_color(24))
+      text = @data[i][0] + (@filter.nil? ? "" : ": " + @filter)
+      draw_text(item_rect(i), text)
       return
     end
 
