@@ -1,8 +1,6 @@
 # TODO
 
 module TLS_Scenes
-  EnableFiltering = true
-
   Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum D'umpe", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
 
   # If a scene is given the exact same name as any of the following words, weird issues will happen
@@ -51,7 +49,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
     super
     create_select_window
     create_face_window
-    TLS_Scenes::EnableFiltering and create_filter_window
+    create_filter_window
 
     if @@filter
       set_filter(@@filter)
@@ -60,16 +58,14 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
   
   def play_event
-    if TLS_Scenes::EnableFiltering
-      if @select_window.is_filter_button?
-        show_filter_window
-        return
-      end
+    if @select_window.is_filter_button?
+      show_filter_window
+      return
+    end
 
-      if @select_window.is_clear_button?
-        reset_filter
-        return
-      end
+    if @select_window.is_clear_button?
+      reset_filter
+      return
     end
 
     @@cursor_position = @select_window.index
@@ -133,30 +129,24 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
 
   def get_extended_data
-    if TLS_Scenes::EnableFiltering
-      return [[TLS_Scenes::FilterLabel], [TLS_Scenes::SeparatorLabel]].concat(get_data)
-    end
-
-    get_data
+    [[TLS_Scenes::FilterLabel], [TLS_Scenes::SeparatorLabel]].concat(get_data)
   end
     
   def draw_item(i)
-    if TLS_Scenes::EnableFiltering
-      if @data[i][0] == TLS_Scenes::FilterLabel
-        change_color(text_color(24))
-        text = @data[i][0] + (@filter.nil? ? "" : ": " + @filter)
-        draw_text(item_rect(i), text)
-        return
-      end
-
-      if @data[i][0] == TLS_Scenes::ClearLabel
-        change_color(text_color(18))
-        draw_text(item_rect(i), @data[i][0])
-        return
-      end
-
-      change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
+    if @data[i][0] == TLS_Scenes::FilterLabel
+      change_color(text_color(24))
+      text = @data[i][0] + (@filter.nil? ? "" : ": " + @filter)
+      draw_text(item_rect(i), text)
+      return
     end
+
+    if @data[i][0] == TLS_Scenes::ClearLabel
+      change_color(text_color(18))
+      draw_text(item_rect(i), @data[i][0])
+      return
+    end
+
+    change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
 
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
@@ -165,7 +155,7 @@ class TLS_Replay_Select_Window < Window_Selectable
   def update
     super
 
-    if TLS_Scenes::EnableFiltering && (is_filter_button? || is_separator? || is_clear_button?)
+    if is_filter_button? || is_separator? || is_clear_button?
       @face_window.reset
       return
     end
