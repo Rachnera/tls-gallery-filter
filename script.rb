@@ -713,6 +713,7 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
     
   def draw_item(i)
+    change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
   end
