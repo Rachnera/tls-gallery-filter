@@ -213,9 +213,9 @@ class TLS_Replay_Face_Window < Window_Base
 end
 
 class TLS_Scene_Filter < Window_Selectable
-  COL_MAX = 6
-  ROW_MAX = 5
-  FACE_SIZE = 96 * 1/2
+  COL_MAX = 5
+  ROW_MAX = 4
+  FACE_SIZE = 96 * 3/4
   FACE_PADDING = 4
   SPACING = 32 / 2
   STANDARD_PADDING = 12
