@@ -72,6 +72,12 @@ module TLS_Scenes
       CharacterNameToSpriteName[category] = TLS_Scenes::guess_sprite_name(category)
     end
   end
+
+  CustomSpriteIndex = {
+    "Elleani" => 6,
+    "Janine" => 4,
+    "Sabitha" => 1,
+  }
 end
 
 class Scene_TLS_Replayer < Scene_MenuBase
@@ -298,7 +304,7 @@ class TLS_Scene_Filter < Window_Selectable
 
     draw_character(
       TLS_Scenes::CharacterNameToSpriteName[category],
-      0,
+      TLS_Scenes::CustomSpriteIndex[category] || 0,
       rect.x + item_width / 2,
       rect.y + sprite_size + item_top_padding,
     )
