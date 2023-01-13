@@ -45,6 +45,33 @@ module TLS_Scenes
     end
     category
   end
+
+  def self.guess_sprite_name(category)
+    ["$" + category + " char", category + " char", category].each do |name|
+      if File.file?("Graphics/Characters/" + name + ".png")
+        return name
+      end
+    end
+
+    # Some fallback, to avoid a game crash
+    "Ginasta char silhouette"
+  end
+
+  # For unusually named sprite sheets
+  CharacterNameToSpriteName = {
+    "Dari" => "$Dari1 char",
+    "NPC" => "z maids char",
+    "Harem" => "Monster1blue",
+    "Qum" => "$Qum nude",
+    "Robin" => "Robin blond",
+    "Janine" => "Janine char2",
+  }
+
+  Categories.each do |category|
+    if not CharacterNameToSpriteName.has_key?(category)
+      CharacterNameToSpriteName[category] = TLS_Scenes::guess_sprite_name(category)
+    end
+  end
 end
 
 class Scene_TLS_Replayer < Scene_MenuBase
@@ -274,7 +301,7 @@ class TLS_Scene_Filter < Window_Selectable
     # FIXME: x/y computations below makes little sense
     # Due to everything else having been designed for a square containing a single element
     draw_character(
-      filename(category),
+      TLS_Scenes::CharacterNameToSpriteName[category],
       0,
       rect.x + face_size / 2 + face_padding,
       rect.y + face_size - 32/2 + face_padding,
@@ -282,31 +309,6 @@ class TLS_Scene_Filter < Window_Selectable
     reset_font_settings
     make_font_smaller
     draw_text(rect.x, rect.y + 32, rect.width, line_height, category, 1)
-  end
-
-  def filename(category)
-    ref = {
-      "Dari" => "$Dari1 char",
-      "NPC" => "z maids char",
-      "Harem" => "Monster1blue",
-      "Qum" => "$Qum nude",
-      "Robin" => "Robin blond",
-      "Janine" => "Janine char2",
-    }
-
-    if ref[category]
-      return ref[category]
-    end
-
-    if File.file?("Graphics/Characters/$" + category + " char.png")
-      return "$" + category + " char"
-    end
-
-      if File.file?("Graphics/Characters/" + category + ".png")
-      return category
-    end
-
-    category + " char"
   end
 
   def get_filter
