@@ -3,7 +3,7 @@
 # https://github.com/Rachnera/tls-gallery-filter for last version
 
 module TLS_Scenes
-  Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum D'umpe", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
+  Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda"].sort
 
   # If a scene is given the exact same name as any of the following words, weird issues will happen
   FilterLabel = "Filter"
@@ -24,6 +24,7 @@ module TLS_Scenes
     "Robin blond" => "Robin",
     "Robin grey" => "Robin",
     "Sabitha H" => "Sabitha",
+    "Qum D'umpe" => "Qum",
   }
 
   # Dark magic to deduce a scene categories from its sprites
@@ -88,7 +89,6 @@ class Scene_TLS_Replayer < Scene_MenuBase
 
     @filter_window = TLS_Scene_Filter.new((Graphics.width - width) / 2, (Graphics.height - height) / 2, width, height)
     @filter_window.remove_empty_categories(@select_window)
-    @filter_window.build_faces(@select_window)
     @filter_window.refresh
     @filter_window.set_handler(:cancel, method(:hide_filter_window))
     @filter_window.set_handler(:ok, method(:set_filter_from_ui))
@@ -213,17 +213,16 @@ class TLS_Replay_Face_Window < Window_Base
 end
 
 class TLS_Scene_Filter < Window_Selectable
-  COL_MAX = 5
-  ROW_MAX = 4
-  FACE_SIZE = 96 * 3/4
+  COL_MAX = 7
+  ROW_MAX = 6
+  FACE_SIZE = 32
   FACE_PADDING = 4
-  SPACING = 32 / 2
+  SPACING = 8
   STANDARD_PADDING = 12
 
   def initialize(x, y, width, height)
     super
     @data = TLS_Scenes::Categories
-    @faces = {}
     self.z = 999 # Arbitrarily high number to force the window to appear above everything else on the screen
   end
 
@@ -271,23 +270,38 @@ class TLS_Scene_Filter < Window_Selectable
   def draw_item(index)
     category = @data[index]
     rect = item_rect(index)
-    draw_rescaled_face(
-      @faces[category][:name],
-      @faces[category][:index],
-      rect.x + face_padding,
-      rect.y + face_padding,
-      face_size
+
+    draw_character(
+      filename(category),
+      0,
+      rect.x + face_size / 2 + face_padding,
+      rect.y + face_size + face_padding,
     )
   end
 
-  # Based on Window_Base#draw_face
-  # And https://www.rubydoc.info/gems/openrgss/Bitmap#stretch_blt-instance_method
-  def draw_rescaled_face(face_name, face_index, x, y, size)
-    bitmap = Cache.face(face_name)
-    src_rect = Rect.new(face_index % 4 * 96, face_index / 4 * 96, 96, 96)
-    dest_rect = Rect.new(x, y, size, size)
-    contents.stretch_blt(dest_rect, bitmap, src_rect)
-    bitmap.dispose
+  def filename(category)
+    ref = {
+      "Dari" => "$Dari1 char",
+      "NPC" => "z maids char",
+      "Harem" => "Monster1blue",
+      "Qum" => "$Qum nude",
+      "Robin" => "Robin blond",
+      "Janine" => "Janine char2",
+    }
+
+    if ref[category]
+      return ref[category]
+    end
+
+    if File.file?("Graphics/Characters/$" + category + " char.png")
+      return "$" + category + " char"
+    end
+
+      if File.file?("Graphics/Characters/" + category + ".png")
+      return category
+    end
+
+    category + " char"
   end
 
   def get_filter
@@ -297,31 +311,5 @@ class TLS_Scene_Filter < Window_Selectable
   def refresh
     create_contents
     draw_all_items
-  end
-
-  # FIXME: Work as is, but should be called once for all, not each time the window is created
-  def build_faces(select_window)
-    faces = {
-      # Hardcode the NPC icon to avoid a random early game NPC from being the face of it
-      "NPC" => {
-        :name => "NPC emo",
-        :index => 0,
-      }
-    }
-    TLS_Scenes::Scene_data.each do |scene|
-      next unless select_window.check_scene_visible(scene)
-      face_names = scene[1]
-      face_indexes = scene[2]
-      face_names.each_with_index do |face_name, i|
-        category = TLS_Scenes::sprite_to_category(face_name)
-        if not faces.has_key?(category)
-          faces[category] = {
-            :name => face_name,
-            :index => face_indexes[i],
-          }
-        end
-      end
-    end
-    @faces = faces
   end
 end
