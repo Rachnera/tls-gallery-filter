@@ -110,9 +110,8 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
   
   def create_filter_window
-    face_size = TLS_Scene_Filter::FACE_SIZE + TLS_Scene_Filter::FACE_PADDING * 2
-    width = TLS_Scene_Filter::COL_MAX * (face_size + TLS_Scene_Filter::SPACING) + TLS_Scene_Filter::STANDARD_PADDING * 2 - TLS_Scene_Filter::SPACING
-    height = TLS_Scene_Filter::ROW_MAX * face_size + TLS_Scene_Filter::STANDARD_PADDING * 2
+    width = TLS_Scene_Filter::COL_MAX * (TLS_Scene_Filter::SELECTABLE_SIZE + TLS_Scene_Filter::SPACING) - TLS_Scene_Filter::SPACING + TLS_Scene_Filter::STANDARD_PADDING * 2
+    height = TLS_Scene_Filter::ROW_MAX * TLS_Scene_Filter::SELECTABLE_SIZE + TLS_Scene_Filter::STANDARD_PADDING * 2
 
     @filter_window = TLS_Scene_Filter.new((Graphics.width - width) / 2, (Graphics.height - height) / 2, width, height)
     @filter_window.remove_empty_categories(@select_window)
@@ -242,8 +241,7 @@ end
 class TLS_Scene_Filter < Window_Selectable
   COL_MAX = 7
   ROW_MAX = 6
-  FACE_SIZE = 48
-  FACE_PADDING = 2
+  SELECTABLE_SIZE = 32 + 24 # Sprite height + enough space for a readable text
   SPACING = 8
   STANDARD_PADDING = 12
 
@@ -270,20 +268,12 @@ class TLS_Scene_Filter < Window_Selectable
     @data ? @data.size : 0
   end
 
-  def face_size
-    TLS_Scene_Filter::FACE_SIZE
-  end
-
-  def face_padding
-    TLS_Scene_Filter::FACE_PADDING
-  end
-
   def spacing
     TLS_Scene_Filter::SPACING
   end
 
   def item_height
-    face_size + face_padding * 2
+    TLS_Scene_Filter::SELECTABLE_SIZE
   end
 
   def item_width
@@ -295,20 +285,24 @@ class TLS_Scene_Filter < Window_Selectable
   end
 
   def draw_item(index)
+    reset_font_settings
+    make_font_smaller
+    font_size = contents.font.size
+
+    sprite_size = 32
+    item_top_padding = 4
+    item_bottom_padding = 2
+
     category = @data[index]
     rect = item_rect(index)
 
-    # FIXME: x/y computations below makes little sense
-    # Due to everything else having been designed for a square containing a single element
     draw_character(
       TLS_Scenes::CharacterNameToSpriteName[category],
       0,
-      rect.x + face_size / 2 + face_padding,
-      rect.y + face_size - 32/2 + face_padding,
+      rect.x + item_width / 2,
+      rect.y + sprite_size + item_top_padding,
     )
-    reset_font_settings
-    make_font_smaller
-    draw_text(rect.x, rect.y + 32, rect.width, line_height, category, 1)
+    draw_text(rect.x, rect.y + rect.height - font_size - item_bottom_padding, rect.width, font_size, category, 1)
   end
 
   def get_filter
