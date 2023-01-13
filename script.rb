@@ -215,8 +215,8 @@ end
 class TLS_Scene_Filter < Window_Selectable
   COL_MAX = 7
   ROW_MAX = 6
-  FACE_SIZE = 32
-  FACE_PADDING = 4
+  FACE_SIZE = 48
+  FACE_PADDING = 2
   SPACING = 8
   STANDARD_PADDING = 12
 
@@ -271,12 +271,17 @@ class TLS_Scene_Filter < Window_Selectable
     category = @data[index]
     rect = item_rect(index)
 
+    # FIXME: x/y computations below makes little sense
+    # Due to everything else having been designed for a square containing a single element
     draw_character(
       filename(category),
       0,
       rect.x + face_size / 2 + face_padding,
-      rect.y + face_size + face_padding,
+      rect.y + face_size - 32/2 + face_padding,
     )
+    reset_font_settings
+    make_font_smaller
+    draw_text(rect.x, rect.y + 32, rect.width, line_height, category, 1)
   end
 
   def filename(category)
