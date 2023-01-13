@@ -10,8 +10,8 @@ module TLS_Scenes
   SeparatorLabel = "-----"
   ClearLabel = "Clear filter"
 
-  # For non-NPC sprites that don't follow the convention "<character name> emo"
-  SpriteNameToCharacterName = {
+  # For non-NPC faces that don't follow the convention "<character name> emo"
+  FaceNameToCharacterName = {
     "face002b" => "Simon",
     "face002b dark" => "Simon",
     "1 Simon dark" => "Simon",
@@ -27,17 +27,17 @@ module TLS_Scenes
     "Qum D'umpe" => "Qum",
   }
 
-  # Dark magic to deduce a scene categories from its sprites
-  def self.sprites_to_categories(sprites)
-    sprites.map do |sprite_name|
-      TLS_Scenes::sprite_to_category(sprite_name)
+  # Dark magic to deduce a scene categories from its associated faces
+  def self.faces_to_categories(faces)
+    faces.map do |name|
+      TLS_Scenes::face_to_category(name)
     end.uniq
   end
 
-  def self.sprite_to_category(sprite_name)
-    category = sprite_name.gsub(/\s+emo.*/, '')
-    if TLS_Scenes::SpriteNameToCharacterName.has_key?(category)
-      category = TLS_Scenes::SpriteNameToCharacterName[category]
+  def self.face_to_category(name)
+    category = name.gsub(/\s+emo.*/, '')
+    if TLS_Scenes::FaceNameToCharacterName.has_key?(category)
+      category = TLS_Scenes::FaceNameToCharacterName[category]
     end
     # Group all minor characters within the NPC category
     unless TLS_Scenes::Categories.include?(category)
@@ -199,7 +199,7 @@ class TLS_Replay_Select_Window < Window_Selectable
   def filter_data(filter)
     @filter = filter
     data = get_data.select do |elt|
-      TLS_Scenes::sprites_to_categories(elt[2]).include?(filter)
+      TLS_Scenes::faces_to_categories(elt[2]).include?(filter)
     end
     @data = [[TLS_Scenes::FilterLabel], [TLS_Scenes::ClearLabel], [TLS_Scenes::SeparatorLabel]].concat(data)
     refresh
@@ -230,7 +230,7 @@ class TLS_Scene_Filter < Window_Selectable
   def remove_empty_categories(select_window)
     @data = @data.select do |category|
       TLS_Scenes::Scene_data.any? do |scene|
-        select_window.check_scene_visible(scene) and TLS_Scenes::sprites_to_categories(scene[1]).include?(category)
+        select_window.check_scene_visible(scene) and TLS_Scenes::faces_to_categories(scene[1]).include?(category)
       end
     end
   end
