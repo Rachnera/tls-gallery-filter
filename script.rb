@@ -65,6 +65,7 @@ module TLS_Scenes
     "Qum" => "$Qum nude",
     "Robin" => "Robin blond",
     "Janine" => "Janine char2",
+    "Ivala" => "Spiritual",
   }
 
   Categories.each do |category|
@@ -77,6 +78,7 @@ module TLS_Scenes
     "Elleani" => 6,
     "Janine" => 4,
     "Sabitha" => 1,
+    "Ivala" => 6,
   }
 end
 
