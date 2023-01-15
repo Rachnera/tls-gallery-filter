@@ -260,12 +260,20 @@ class TLS_Scene_Filter < Window_Selectable
     self.z = 999 # Arbitrarily high number to force the window to appear above everything else on the screen
   end
 
-  # FIXME: Work as is, but does far more loops than it would with a different algorithm
   def remove_empty_categories(select_window)
-    @data = @data.select do |category|
-      TLS_Scenes::Scene_data.any? do |scene|
-        select_window.check_scene_visible(scene) and TLS_Scenes::faces_to_categories(scene[1]).include?(category)
+    visible_categories = []
+    TLS_Scenes::Scene_data.each do |scene|
+      if select_window.check_scene_visible(scene)
+        TLS_Scenes::faces_to_categories(scene[1]).each do |category|
+          if not visible_categories.include?(category)
+            visible_categories.push(category)
+          end
+        end
       end
+    end
+
+    @data = @data.select do |category|
+      visible_categories.include?(category)
     end
   end
 
