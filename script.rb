@@ -118,8 +118,8 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
   
   def create_filter_window
-    width = TLS_Scene_Filter::COL_MAX * (TLS_Scene_Filter::SELECTABLE_SIZE + TLS_Scene_Filter::SPACING) - TLS_Scene_Filter::SPACING + TLS_Scene_Filter::STANDARD_PADDING * 2
-    height = TLS_Scene_Filter::ROW_MAX * TLS_Scene_Filter::SELECTABLE_SIZE + TLS_Scene_Filter::STANDARD_PADDING * 2
+    width = TLS_Scene_Filter::COL_MAX * (TLS_Scene_Filter::SELECTABLE_WIDTH + TLS_Scene_Filter::SPACING) - TLS_Scene_Filter::SPACING + TLS_Scene_Filter::STANDARD_PADDING * 2
+    height = TLS_Scene_Filter::ROW_MAX * TLS_Scene_Filter::SELECTABLE_HEIGHT + TLS_Scene_Filter::STANDARD_PADDING * 2
 
     @filter_window = TLS_Scene_Filter.new((Graphics.width - width) / 2, (Graphics.height - height) / 2, width, height)
     @filter_window.remove_empty_categories(@select_window)
@@ -249,7 +249,8 @@ end
 class TLS_Scene_Filter < Window_Selectable
   COL_MAX = 7
   ROW_MAX = 6
-  SELECTABLE_SIZE = 32 + 24 # Sprite height + enough space for a readable text
+  SELECTABLE_HEIGHT = 32 + 24 # Sprite height + enough vertical space for text
+  SELECTABLE_WIDTH = 58 # Enough horizontal space for nice looking long names (ex: Hilstara)
   SPACING = 8
   STANDARD_PADDING = 12
 
@@ -281,11 +282,11 @@ class TLS_Scene_Filter < Window_Selectable
   end
 
   def item_height
-    TLS_Scene_Filter::SELECTABLE_SIZE
+    TLS_Scene_Filter::SELECTABLE_HEIGHT
   end
 
   def item_width
-    item_height
+    TLS_Scene_Filter::SELECTABLE_WIDTH
   end
 
   def standard_padding
