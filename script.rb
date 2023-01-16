@@ -80,6 +80,9 @@ module TLS_Scenes
     "Sabitha" => 1,
     "Ivala" => 6,
   }
+
+  ShowIfHasPicture = true
+  PictureIcon = 1258
 end
 
 class Scene_TLS_Replayer < Scene_MenuBase
@@ -180,21 +183,43 @@ class TLS_Replay_Select_Window < Window_Selectable
   def draw_item(i)
     if @data[i][0] == TLS_Scenes::FilterLabel
       change_color(text_color(24))
-      text = @data[i][0] + (@filter.nil? ? "" : ": " + @filter)
+      text = TLS_Scenes::FilterLabel + (@filter.nil? ? "" : ": " + @filter)
       draw_text(item_rect(i), text)
       return
     end
 
     if @data[i][0] == TLS_Scenes::ClearLabel
       change_color(text_color(18))
-      draw_text(item_rect(i), @data[i][0])
+      draw_text(item_rect(i), TLS_Scenes::ClearLabel)
       return
     end
 
-    change_color(normal_color, @data[i][0] != TLS_Scenes::SeparatorLabel)
+    if @data[i][0] ==  TLS_Scenes::SeparatorLabel
+      change_color(normal_color, false)
+      draw_text(item_rect(i), TLS_Scenes::SeparatorLabel)
+      return
+    end
 
+    change_color(normal_color)
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
+
+    if TLS_Scenes::ShowIfHasPicture
+      has_picture = $data_common_events[get_event_id_for_name(@data[i][0])].list.any? do |event_command|
+        event_command.parameters.any? do |parameter|
+          parameter.is_a?(String) && parameter.include?("show_nsfw")
+        end
+      end
+
+      if has_picture
+        draw_icon(
+          TLS_Scenes::PictureIcon,
+          rect.x + rect.width - 24,
+          rect.y + (rect.height - 24) / 2,
+          false
+        )
+      end
+    end
   end
   
   def update
