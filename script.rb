@@ -1,5 +1,8 @@
 # Rachnera Gallery Filter
-# Partial patch of LoneWolf Scene Replay to add a minimalist search feature to it
+# Add a basic filtering feature to LoneWolf Scene Replay script
+# How to use:
+#   - Add as any other script, through  Tools > Script Editor
+#   - Need to be put below both Lone Wolf: Scene Replay and Decanter: Return to Replay Menu to work properly
 # https://github.com/Rachnera/tls-gallery-filter for last version
 
 module TLS_Scenes
