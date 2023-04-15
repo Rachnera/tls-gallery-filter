@@ -163,6 +163,11 @@ class Scene_TLS_Replayer < Scene_MenuBase
   end
 
   def cancel_replay_menu
+    if @select_window.filter
+        reset_filter
+        return
+    end
+
     $game_switches[7] = false # must match condition for common event 4
     @@cursor_position = 0
     @@filter = nil
