@@ -49,17 +49,6 @@ module TLS_Scenes
     category
   end
 
-  def self.guess_sprite_name(category)
-    ["$" + category + " char", category + " char", category].each do |name|
-      if File.file?("Graphics/Characters/" + name + ".png")
-        return name
-      end
-    end
-
-    # Some fallback, to avoid a game crash
-    "Ginasta char silhouette"
-  end
-
   # For unusually named sprite sheets
   CharacterNameToSpriteName = {
     "Dari" => "$Dari1 char",
@@ -70,12 +59,6 @@ module TLS_Scenes
     "Janine" => "Janine char2",
     "Ivala" => "Spiritual",
   }
-
-  Categories.each do |category|
-    if not CharacterNameToSpriteName.has_key?(category)
-      CharacterNameToSpriteName[category] = TLS_Scenes::guess_sprite_name(category)
-    end
-  end
 
   CustomSpriteIndex = {
     "Elleani" => 6,
@@ -323,6 +306,8 @@ class TLS_Scene_Filter < Window_Selectable
   SPACING = 8
   STANDARD_PADDING = 12
 
+  @@sprite_names = TLS_Scenes::CharacterNameToSpriteName
+
   def initialize(x, y, width, height)
     super
     @data = TLS_Scenes::Categories
@@ -383,7 +368,7 @@ class TLS_Scene_Filter < Window_Selectable
     rect = item_rect(index)
 
     draw_character(
-      TLS_Scenes::CharacterNameToSpriteName[category],
+      sprite_name(category),
       TLS_Scenes::CustomSpriteIndex[category] || 0,
       rect.x + item_width / 2,
       rect.y + sprite_size + item_top_padding,
@@ -398,5 +383,24 @@ class TLS_Scene_Filter < Window_Selectable
   def refresh
     create_contents
     draw_all_items
+  end
+
+  def sprite_name(category)
+    if not @@sprite_names.has_key?(category)
+      @@sprite_names[category] = guess_sprite_name(category)
+    end
+
+    @@sprite_names[category]
+  end
+
+  def guess_sprite_name(category)
+    ["$" + category + " char", category + " char", category].each do |name|
+      if File.file?("Graphics/Characters/" + name + ".png")
+        return name
+      end
+    end
+
+    # Some fallback, to avoid a game crash
+    "Ginasta char silhouette"
   end
 end
