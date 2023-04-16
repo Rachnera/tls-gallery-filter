@@ -86,6 +86,7 @@ module TLS_Scenes
 
   ShowIfHasPicture = true
   PictureIcon = 1258
+  BugIcon = 2064
 end
 
 class Scene_TLS_Replayer < Scene_MenuBase
@@ -214,20 +215,22 @@ class TLS_Replay_Select_Window < Window_Selectable
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
 
-    if TLS_Scenes::ShowIfHasPicture and !!event_id
-      has_picture = $data_common_events[event_id].list.any? do |event_command|
-        event_command.parameters.any? do |parameter|
-          parameter.is_a?(String) && parameter.include?("show_nsfw")
-        end
-      end
-
-      if has_picture
+    if TLS_Scenes::ShowIfHasPicture
+      if !event_id
         draw_icon(
-          TLS_Scenes::PictureIcon,
+          TLS_Scenes::BugIcon,
           rect.x + rect.width - 24,
           rect.y + (rect.height - 24) / 2,
           false
         )
+      else if has_picture?(event_id)
+        draw_icon(
+            TLS_Scenes::PictureIcon,
+            rect.x + rect.width - 24,
+            rect.y + (rect.height - 24) / 2,
+            false
+          )
+        end
       end
     end
   end
@@ -291,6 +294,18 @@ class TLS_Replay_Select_Window < Window_Selectable
     # The later is not ideal, so forcing nil instead
 
     event_id.is_a?(Integer) ? event_id : nil
+  end
+
+  def has_picture?(event_id)
+    if !event_id
+      return false
+    end
+
+    $data_common_events[event_id].list.any? do |event_command|
+      event_command.parameters.any? do |parameter|
+        parameter.is_a?(String) && parameter.include?("show_nsfw")
+      end
+    end
   end
 end
 
