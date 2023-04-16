@@ -395,8 +395,11 @@ class TLS_Scene_Filter < Window_Selectable
 
   def guess_sprite_name(category)
     ["$" + category + " char", category + " char", category].each do |name|
-      if File.file?("Graphics/Characters/" + name + ".png")
+      begin
+        Cache.character(name)
         return name
+      rescue
+        # Expected exception. Should just mean that wasn't the right guess and no file with that name exists
       end
     end
 
