@@ -208,12 +208,14 @@ class TLS_Replay_Select_Window < Window_Selectable
       return
     end
 
-    change_color(normal_color)
+    event_id = clean_event_id(i)
+
+    change_color(normal_color, !!event_id)
     rect = item_rect(i)
     draw_text(rect, @data[i][0])
 
-    if TLS_Scenes::ShowIfHasPicture
-      has_picture = $data_common_events[get_event_id_for_name(@data[i][0])].list.any? do |event_command|
+    if TLS_Scenes::ShowIfHasPicture and !!event_id
+      has_picture = $data_common_events[event_id].list.any? do |event_command|
         event_command.parameters.any? do |parameter|
           parameter.is_a?(String) && parameter.include?("show_nsfw")
         end
@@ -254,7 +256,15 @@ class TLS_Replay_Select_Window < Window_Selectable
   end
 
   def current_item_enabled?
-    !is_separator?
+    if is_filter_button? || is_clear_button?
+      return true
+    end
+
+    if is_separator?
+      return false
+    end
+
+    !!clean_event_id(index)
   end
 
   def reset_data
@@ -270,6 +280,17 @@ class TLS_Replay_Select_Window < Window_Selectable
     end
     @data = [[TLS_Scenes::FilterLabel], [TLS_Scenes::ClearLabel], [TLS_Scenes::SeparatorLabel]].concat(data)
     refresh
+  end
+
+  def clean_event_id(i)
+    event_id = get_event_id_for_name(@data[i][0])
+
+    # Due to the way get_event_id_for_name is coded
+    # It returns an int if the event is found
+    # ... And the list of every common event in the game if not
+    # The later is not ideal, so forcing nil instead
+
+    event_id.is_a?(Integer) ? event_id : nil
   end
 end
 
