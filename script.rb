@@ -3,6 +3,7 @@
 # How to use:
 #   - Add as any other script, through  Tools > Script Editor
 #   - Need to be put below both Lone Wolf: Scene Replay and Decanter: Return to Replay Menu to work properly
+# Version: 1.1
 # https://github.com/Rachnera/tls-gallery-filter for last version
 
 module TLS_Scenes
