@@ -52,7 +52,6 @@ module TLS_Scenes
 
   # For unusually named sprite sheets
   CharacterNameToSpriteName = {
-    "Dari" => "$Dari1 char",
     "NPC" => "z maids char",
     "Harem" => "Monster1blue",
     "Qum" => "$Qum nude",
@@ -387,6 +386,12 @@ class TLS_Scene_Filter < Window_Selectable
   end
 
   def sprite_name(category)
+    # Dari special case
+    # Willingly not "cached" so it updates properly when switching saves
+    if category == "Dari"
+      return $game_switches[2369] ? "$Dari2 char" : "$Dari1 char"
+    end
+
     if not @@sprite_names.has_key?(category)
       @@sprite_names[category] = guess_sprite_name(category)
     end
