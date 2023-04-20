@@ -143,6 +143,7 @@ class Scene_TLS_Replayer < Scene_MenuBase
 
   def reset_filter
     @select_window.reset_data
+    @select_window.select(0)
     hide_filter_window
   end
 
