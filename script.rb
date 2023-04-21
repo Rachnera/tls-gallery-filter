@@ -7,7 +7,7 @@
 # https://github.com/Rachnera/tls-gallery-filter for last version
 
 module TLS_Scenes
-  Categories = ["Simon", "Riala", "Yarra", "Aka", "Qum", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda", "Lilith"].sort_by { |word| word.downcase }
+  Categories = ["No Simon", "Riala", "Yarra", "Aka", "Qum", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda", "Lilith"].sort_by { |word| word.downcase }
 
   # If a scene is given the exact same name as any of the following words, weird issues will happen
   FilterLabel = "Filter"
@@ -33,9 +33,22 @@ module TLS_Scenes
 
   # Dark magic to deduce a scene categories from its associated faces
   def self.faces_to_categories(faces)
-    faces.map do |name|
-      TLS_Scenes::face_to_category(name)
-    end.uniq
+    categories = []
+    without_simon = true
+
+    faces.each do |name|
+      if TLS_Scenes::is_simon?(name)
+        without_simon = false
+        next
+      end
+      categories.push(TLS_Scenes::face_to_category(name))
+    end
+
+    if without_simon
+      categories.push("No Simon")
+    end
+
+    categories.uniq
   end
 
   def self.face_to_category(name)
@@ -48,6 +61,10 @@ module TLS_Scenes
       category = "NPC"
     end
     category
+  end
+
+  def self.is_simon?(name)
+    TLS_Scenes::FaceNameToCharacterName[name] == "Simon"
   end
 
   # For unusually named sprite sheets
