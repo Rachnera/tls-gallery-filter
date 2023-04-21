@@ -76,6 +76,7 @@ module TLS_Scenes
     "Janine" => "Janine char2",
     "Ivala" => "Spiritual",
     "Zelica" => "$Zelica_32x32",
+    "No Simon" => "Simon char silhouette",
   }
 
   CustomSpriteIndex = {
