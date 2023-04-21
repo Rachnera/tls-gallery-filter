@@ -70,7 +70,7 @@ module TLS_Scenes
   # For unusually named sprite sheets
   CharacterNameToSpriteName = {
     "NPC" => "z maids char",
-    "Harem" => "Monster1blue",
+    "Harem" => "Simon char",
     "Qum" => "$Qum nude",
     "Robin" => "Robin blond",
     "Janine" => "Janine char2",
