@@ -75,7 +75,7 @@ module TLS_Scenes
     "Robin" => "Robin blond",
     "Janine" => "Janine char2",
     "Ivala" => "Spiritual",
-    "Zelica" => "$Zelica_32x32",
+    "Zelica" => "$Zelica",
     "No Simon" => "Simon char silhouette",
   }
 
