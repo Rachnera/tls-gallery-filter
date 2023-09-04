@@ -7,7 +7,7 @@
 # https://github.com/Rachnera/tls-gallery-filter for last version
 
 module TLS_Scenes
-  Categories = ["No Simon", "Riala", "Yarra", "Aka", "Qum", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda", "Lilith"].sort_by { |word| word.downcase }
+  Categories = ["No Simon", "Riala", "Yarra", "Aka", "Qum", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda", "Lilith", "Illustrated"].sort_by { |word| word.downcase }
 
   # If a scene is given the exact same name as any of the following words, weird issues will happen
   FilterLabel = "Filter"
@@ -77,6 +77,7 @@ module TLS_Scenes
     "Ivala" => "Spiritual",
     "Zelica" => "$Zelica",
     "No Simon" => "Simon char silhouette",
+    "Illustrated" => "$Elite_SuccubusPainter",
   }
 
   CustomSpriteIndex = {
@@ -282,7 +283,12 @@ class TLS_Replay_Select_Window < Window_Selectable
   def filter_data(filter)
     @filter = filter
     data = get_data.select do |elt|
-      TLS_Scenes::faces_to_categories(elt[2]).include?(filter)
+      if filter == "Illustrated"
+        event_id = get_event_id_for_name(elt[0])
+        event_id.is_a?(Integer) and has_picture?(event_id)
+      else
+        TLS_Scenes::faces_to_categories(elt[2]).include?(filter)
+      end
     end
     @data = [[TLS_Scenes::FilterLabel], [TLS_Scenes::ClearLabel], [TLS_Scenes::SeparatorLabel]].concat(data)
     refresh
@@ -344,6 +350,10 @@ class TLS_Scene_Filter < Window_Selectable
           end
         end
       end
+    end
+
+    if TLS_Scenes::ShowIfHasPicture
+      visible_categories.push("Illustrated")
     end
 
     @data = @data.select do |category|
