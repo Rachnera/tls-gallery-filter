@@ -7,7 +7,7 @@
 # https://github.com/Rachnera/tls-gallery-filter for last version
 
 module TLS_Scenes
-  Categories = ["No Simon", "Riala", "Yarra", "Aka", "Qum", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda", "Lilith"].sort_by { |word| word.downcase }
+  Categories = ["No Simon", "Riala", "Yarra", "Aka", "Qum", "NPC", "Hilstara", "Trin", "Megail", "Altina", "Varia", "Carina", "Esthera", "Nalili", "Harem", "Balia", "Lynine", "Orilise", "Iris", "Janine", "Wynn", "Elleani", "Dari", "Uyae", "Robin", "Sarai", "Sabitha", "Tertia", "Ivala", "Mithyn", "Zelica", "Ginasta", "Wendis", "Fheliel", "Neranda", "Lilith", "Grynyth"].sort_by { |word| word.downcase }
 
   # If a scene is given the exact same name as any of the following words, weird issues will happen
   FilterLabel = "Filter"
